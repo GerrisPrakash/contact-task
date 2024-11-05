@@ -6,5 +6,5 @@ export default class Contacts extends Model {
   static table = 'contacts';
 
   @text('name') name: string;
-  @text('phone') phone: string;
+  @text('number') number: string;
 }

@@ -52,7 +52,8 @@
             "modular_headers": true
           }
         }
-      ]
+      ],
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true
