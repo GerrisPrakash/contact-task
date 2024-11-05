@@ -31,7 +31,18 @@
       [
         "expo-contacts",
         {
-          "contactsPermission": "Allow $(PRODUCT_NAME) to access your contacts."
+          "contactsPermission": "Allow contact todo to access your contacts."
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "name": "simdjson",
+            "configurations": ["Debug", "Release"],
+            "path": "../node_modules/@nozbe/simdjson",
+            "modular_headers": true
+          }
         }
       ]
     ],
