@@ -19,7 +19,12 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": [
+        "android.permission.READ_CONTACTS",
+        "android.permission.WRITE_CONTACTS"
+      ],
+      "package": "com.gerris.contacttask"
     },
     "web": {
       "bundler": "metro",
@@ -39,7 +44,10 @@
         {
           "ios": {
             "name": "simdjson",
-            "configurations": ["Debug", "Release"],
+            "configurations": [
+              "Debug",
+              "Release"
+            ],
             "path": "../node_modules/@nozbe/simdjson",
             "modular_headers": true
           }

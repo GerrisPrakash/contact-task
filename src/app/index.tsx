@@ -10,13 +10,13 @@ export default function HomeScreen() {
       const { status } = await Contacts.requestPermissionsAsync();
       if (status === 'granted') {
         const { data } = await Contacts.getContactsAsync({
-          fields: [Contacts.Fields.Emails],
+          fields: [Contacts.Fields.Emails, Contacts.Fields.PhoneNumbers, Contacts.Fields.Image],
         });
 
         if (data.length > 0) {
           const contact = data[0];
           setContacts(data)
-          console.log(data)
+          console.log(contact)
         }
       }
     })();
