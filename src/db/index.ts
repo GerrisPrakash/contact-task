@@ -19,6 +19,7 @@ const adapter = new SQLiteAdapter({
   jsi: true, /* Platform.OS === 'ios' */
   // (optional, but you should implement this method)
   onSetUpError: error => {
+    console.log(error)
     // Database failed to load -- offer the user to reload the app or log out
   }
 })
@@ -27,7 +28,10 @@ const adapter = new SQLiteAdapter({
 const database = new Database({
   adapter,
   modelClasses: [
-    // Post, // ⬅️ You'll add Models to Watermelon here
     Contacts
   ],
 })
+
+export default database
+
+export const contactsCollection = database.get<Contacts>('contacts');

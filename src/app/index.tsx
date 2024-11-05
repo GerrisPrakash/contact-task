@@ -1,7 +1,8 @@
-import { Text, View } from "react-native";
+import { Button, Text, View } from "react-native";
 import * as Contacts from 'expo-contacts';
 import { useEffect, useState } from "react";
 import { Link } from "expo-router";
+import database from "../db";
 
 export default function HomeScreen() {
   const [contacts,setContacts] = useState<any>()
@@ -21,6 +22,18 @@ export default function HomeScreen() {
       }
     })();
   }, []);
+  const dabclick = async()=>{
+    console.log("read")
+    const contactCollection = database.get('contacts')
+    const contacts = await contactCollection.query().fetch()
+    console.log(contacts)
+    // await database.write(async () => {
+    //   await contactCollection.create((contacts)=>{
+    //     contacts.name = 'Test'
+    //     contacts.number = '000'
+    //   })
+    // })
+  }
   return (
     <View
       style={{
@@ -32,8 +45,9 @@ export default function HomeScreen() {
       <Text> contacts
         .</Text>
         {/* <Text>{JSON.stringify(contacts)}</Text> */}
-      <Link href="/ContactDetail">navigate to Contact Details</Link>
-      <Link href="/TaskList">navigate to tasklist</Link>
+      {/* <Link href="/ContactDetail">navigate to Contact Details</Link>
+      <Link href="/TaskList">navigate to tasklist</Link> */}
+      <Button title= "click" onPress={dabclick} />
     </View>
   );
 }
