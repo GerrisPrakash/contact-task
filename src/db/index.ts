@@ -28,3 +28,4 @@ const database = new Database({
 export default database
 
 export const contactsCollection = database.get<Contacts>('contacts');
+export const tasksCollection = database.get<Tasks>('tasks')

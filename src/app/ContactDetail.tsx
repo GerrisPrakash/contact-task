@@ -1,19 +1,41 @@
 import { Text, View, StyleSheet, Button, Modal, TextInput } from "react-native";
-import * as Contacts from "expo-contacts";
-import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useState, useEffect } from "react";
+import { connect } from "react-redux";
 import { RootState } from "../store/store";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { withObservables } from "@nozbe/watermelondb/react";
+import database, { tasksCollection } from "../db";
+import { Q } from "@nozbe/watermelondb";
 
-export default function ContactDetail() {
-  const contact = useSelector(
-    (state: RootState) => state.selectedContact.selectedContact
-  );
+// Main component function
+function ContactDetail({ contact, todo }) {
   const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [todoText, settodoText] = useState("");
 
+  // Fetch tasks and contact data
   useEffect(() => {
-    console.log("gerris", contact);
-  }, [contact]);
+    // Log tasks for debugging
+    (async () => {
+      let taskFromdb = await tasksCollection.query().fetch();
+      console.log("gerriss", taskFromdb.length);
+    })();
+  }, []);
+
+  // Update the task with the new todoText
+  const todoTextChange = (value: string) => {
+    settodoText(value);
+  };
+
+  const updateTodoToDb = async () => {
+    await database.write(async () => {
+      await tasksCollection.create((task) => {
+        task.name = contact.name; // Use contact name from Redux
+        task.number = contact.number; // Use contact number from Redux
+        task.todo = todoText;
+        task.status = "pending"; // Set task status as pending
+      });
+    });
+  };
 
   return (
     <View style={styles.container}>
@@ -28,17 +50,25 @@ export default function ContactDetail() {
         <Text style={styles.content}>name: {contact?.name}</Text>
         <Text style={styles.content}>phone: {contact?.number}</Text>
       </View>
+
       <Text style={styles.heading}>Tasks</Text>
       <View style={styles.personalDetail}>
+        {todo.map((to) => {
+          return <Text key={to.id}>{to.todo}</Text>;
+        })}
         <View style={styles.button}>
           <Button
-            onPress={() => setModalVisible(true)}
+            onPress={() => {
+              setModalVisible(true);
+              settodoText("");
+            }}
             title="Add Task"
             color="black"
           />
         </View>
       </View>
 
+      {/* Modal for adding new task */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -49,7 +79,12 @@ export default function ContactDetail() {
           <View style={styles.backdrop} />
           <View style={styles.modalView}>
             <Text style={styles.modalText}>Add Task in Detail below</Text>
-            <TextInput style={styles.input} placeholder="Enter Task Details" />
+            <TextInput
+              style={styles.input}
+              placeholder="Enter Task Details"
+              onChangeText={todoTextChange}
+              value={todoText}
+            />
             {/* Close button */}
             <View style={styles.buttonContainer}>
               <View style={styles.button}>
@@ -61,8 +96,11 @@ export default function ContactDetail() {
               </View>
               <View style={styles.button}>
                 <Button
-                  onPress={() => setModalVisible(false)}
-                  title="submit"
+                  onPress={() => {
+                    updateTodoToDb();
+                    setModalVisible(false);
+                  }}
+                  title="Submit"
                   color="black"
                 />
               </View>
@@ -73,6 +111,19 @@ export default function ContactDetail() {
     </View>
   );
 }
+
+// `withObservables` is used to observe the tasks collection (WatermelonDB)
+const enhance = withObservables(["contact"], ({ contact }) => ({
+  todo: tasksCollection.query(Q.where('number', contact.number)).observe(),
+}));
+
+// Map Redux state to props
+const mapStateToProps = (state: RootState) => ({
+  contact: state.selectedContact.selectedContact, // Get contact from Redux store
+});
+
+// Combine both `connect` and `withObservables`
+export default connect(mapStateToProps)(enhance(ContactDetail));
 
 const styles = StyleSheet.create({
   container: {
@@ -148,6 +199,6 @@ const styles = StyleSheet.create({
   buttonContainer: {
     display: "flex",
     flexDirection: "row",
-    gap: 20
+    gap: 20,
   },
 });

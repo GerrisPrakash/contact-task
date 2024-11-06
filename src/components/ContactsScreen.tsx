@@ -45,7 +45,6 @@ export default function ContactsScreen() {
       setContacts(contactsFromDB)
     })();
   }, [contacts]);
-  console.log(contacts)
   return (
     <FlatList
       data = {contacts}

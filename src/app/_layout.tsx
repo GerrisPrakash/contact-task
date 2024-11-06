@@ -8,7 +8,12 @@ import { Provider } from "react-redux";
 export default function ContactDetail() {
   return (
     <Provider store={store}>
-      <Tabs>
+      <Tabs
+      screenOptions={{
+        tabBarActiveTintColor: "black", 
+        tabBarInactiveTintColor: "gray", 
+      }}
+      >
         <Tabs.Screen
           name="index"
           options={{
@@ -16,6 +21,7 @@ export default function ContactDetail() {
             tabBarIcon: ({ size, color }) => (
               <MaterialIcons name="contacts" size={size} color={color} />
             ),
+            
           }}
         />
         <Tabs.Screen
