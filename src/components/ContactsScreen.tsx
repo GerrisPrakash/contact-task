@@ -1,4 +1,4 @@
-import { Button, FlatList, Text, View } from "react-native";
+import { Button, FlatList, Modal, StyleSheet, Text, View } from "react-native";
 import * as Contacts from "expo-contacts";
 import { useEffect, useState } from "react";
 import { Link } from "expo-router";
@@ -11,6 +11,7 @@ import { RootState } from "../store/store";
 
 export default function ContactsScreen() {
   const [contacts, setContacts] = useState([]);
+  const [accessDenied, setAccessDenied] = useState<boolean>(false);
   useEffect(() => {
     (async () => {
       const contactCollection = database.get("contacts");
@@ -28,27 +29,60 @@ export default function ContactsScreen() {
           });
 
           if (data.length > 0) {
-            data.forEach(async (contact) => {
-              if (contact.name && contact.phoneNumbers?.[0]?.number) {
-                await database.write(async () => {
+            await database.write(async () => {
+              data.forEach(async (contact, index) => {
+                if (contact.name && contact.phoneNumbers?.[0]?.number) {
                   await contactsCollection.create((contacts) => {
                     contacts.name = contact.name;
                     contacts.number = contact.phoneNumbers?.[0]?.number;
                   });
-                });
-              }
+                }
+                if (index === data.length - 1) {
+                  console.log("completed");
+                }
+              });
             });
           }
+        } else {
+          setAccessDenied(true);
         }
       }
       contactsFromDB = await contactCollection.query().fetch();
-      setContacts(contactsFromDB)
+      setContacts(contactsFromDB);
     })();
   }, [contacts]);
   return (
-    <FlatList
-      data = {contacts}
-      renderItem={({item,index}) => <ContactCards contact= {item} index={index}/>}
-     />
+    <>
+      {accessDenied ? (
+        <Modal visible={accessDenied}>
+          <View  style={styles.accessDenied}>
+            <Text style={styles.text}>
+            Go to Settings {">"} contact-task {">"} Contacts and toggle to allow access.
+            </Text>
+          </View>
+        </Modal>
+      ) : (
+        <FlatList
+          data={contacts}
+          renderItem={({ item, index }) => (
+            <ContactCards contact={item} index={index} />
+          )}
+        />
+      )}
+    </>
   );
 }
+
+const styles = StyleSheet.create({
+  accessDenied: {
+    flex: 1, // Makes the view take up the full screen
+    justifyContent: "center",
+    alignItems: "center",
+    // backgroundColor: "red", // Optional background color
+    margin: 20
+  },
+  text:{
+    marginVertical: 20,
+    fontSize:18
+  }
+});

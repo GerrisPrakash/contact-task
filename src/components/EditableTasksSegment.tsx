@@ -1,0 +1,136 @@
+import { useState } from "react";
+import { Button, Modal, StyleSheet, Text, TextInput, View } from "react-native";
+
+import database, { tasksCollection } from "../db";
+import { withObservables } from "@nozbe/watermelondb/react";
+function EditableTasksSegment({todos, updateTodoToDb, deleteFromDb}) {
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [todoText, SetTodoText] = useState<string>(todos.todo);
+  const todoTextChange = (value: string) => {
+    SetTodoText(value);
+  };
+  return (
+    <View>
+      <Text>{todos.todo}</Text>
+      <View style={styles.buttonContainer}>
+        <View style={styles.button}>
+          <Button
+            onPress={() => setModalVisible(true)}
+            title="edit"
+            color="gray"
+          />
+        </View>
+        <View style={styles.button}>
+          <Button
+            onPress={() => {
+              deleteFromDb(todos.id);
+            }}
+            title="delete"
+            color="black"
+          />
+        </View>
+      </View>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)} 
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.backdrop} />
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>Edit Task in Detail below</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Edit Task Details"
+              onChangeText={todoTextChange}
+              value={todoText}
+            />
+            {/* Close button */}
+            <View style={styles.buttonContainer}>
+              <View style={styles.button}>
+                <Button
+                  onPress={() => {
+                    setModalVisible(false);
+                    SetTodoText(todos.todo);
+                  }}
+                  title="Close"
+                  color="gray"
+                />
+              </View>
+              <View style={styles.button}>
+                <Button
+                  onPress={() => {
+                    updateTodoToDb(todos.id, todoText);
+                    setModalVisible(false);
+                  }}
+                  disabled={todoText.length === 0}
+                  title="Submit"
+                  color="black"
+                />
+              </View>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    </View>
+  );
+}
+
+const enhance = withObservables([], ({todos}:any) => ({
+    todos: todos.observe()
+}))
+
+export default enhance(EditableTasksSegment)
+
+const styles = StyleSheet.create({
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    position: "relative",
+  },
+  backdrop: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    zIndex: 1,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 20,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    width: "90%",
+    zIndex: 2,
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: "center",
+  },
+  input: {
+    height: 40,
+    margin: 12,
+    borderWidth: 1,
+    padding: 10,
+    width: "100%",
+    borderRadius: 5,
+  },
+  buttonContainer: {
+    display: "flex",
+    flexDirection: "row",
+    gap: 20,
+  },
+  button: {
+    width: 100,
+  },
+});

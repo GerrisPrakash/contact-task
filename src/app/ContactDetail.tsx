@@ -6,6 +6,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { withObservables } from "@nozbe/watermelondb/react";
 import database, { tasksCollection } from "../db";
 import { Q } from "@nozbe/watermelondb";
+import EditableTasksSegment from "../components/EditableTasksSegment";
 
 // Main component function
 function ContactDetail({ contact, todo }) {
@@ -26,7 +27,7 @@ function ContactDetail({ contact, todo }) {
     settodoText(value);
   };
 
-  const updateTodoToDb = async () => {
+  const createTodoToDb = async () => {
     await database.write(async () => {
       await tasksCollection.create((task) => {
         task.name = contact.name; // Use contact name from Redux
@@ -35,6 +36,20 @@ function ContactDetail({ contact, todo }) {
         task.status = "pending"; // Set task status as pending
       });
     });
+  };
+  const updateTodoToDb = async (id:any, value:any) => {
+    await database.write(async () => {
+        const todo = await tasksCollection.find(id)
+        await todo.update(() => {
+            todo.todo = value
+        })
+      })
+  };
+  const deleteFromDb = async (id:any) => {
+    await database.write(async () => {
+        const todo = await tasksCollection.find(id)
+        await todo.destroyPermanently()
+      })
   };
 
   return (
@@ -53,8 +68,8 @@ function ContactDetail({ contact, todo }) {
 
       <Text style={styles.heading}>Tasks</Text>
       <View style={styles.personalDetail}>
-        {todo.map((to) => {
-          return <Text key={to.id}>{to.todo}</Text>;
+        {todo.map((to:any) => {
+          return <EditableTasksSegment todos={to} updateTodoToDb={updateTodoToDb} deleteFromDb={deleteFromDb} />;
         })}
         <View style={styles.button}>
           <Button
@@ -62,7 +77,7 @@ function ContactDetail({ contact, todo }) {
               setModalVisible(true);
               settodoText("");
             }}
-            title="Add Task"
+            title="+ Add Task"
             color="black"
           />
         </View>
@@ -97,9 +112,10 @@ function ContactDetail({ contact, todo }) {
               <View style={styles.button}>
                 <Button
                   onPress={() => {
-                    updateTodoToDb();
+                    createTodoToDb();
                     setModalVisible(false);
                   }}
+                  disabled={todoText.length === 0}
                   title="Submit"
                   color="black"
                 />
@@ -112,17 +128,14 @@ function ContactDetail({ contact, todo }) {
   );
 }
 
-// `withObservables` is used to observe the tasks collection (WatermelonDB)
 const enhance = withObservables(["contact"], ({ contact }) => ({
-  todo: tasksCollection.query(Q.where('number', contact.number)).observe(),
+  todo: tasksCollection.query(Q.where("number", contact.number)).observe(),
 }));
 
-// Map Redux state to props
 const mapStateToProps = (state: RootState) => ({
-  contact: state.selectedContact.selectedContact, // Get contact from Redux store
+  contact: state.selectedContact.selectedContact,
 });
 
-// Combine both `connect` and `withObservables`
 export default connect(mapStateToProps)(enhance(ContactDetail));
 
 const styles = StyleSheet.create({
@@ -167,8 +180,8 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent black backdrop
-    zIndex: 1, // Make sure backdrop appears below modal content
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    zIndex: 1,
   },
   modalView: {
     margin: 20,
@@ -182,7 +195,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
     width: "90%",
-    zIndex: 2, // Modal content above the backdrop
+    zIndex: 2,
   },
   modalText: {
     marginBottom: 15,

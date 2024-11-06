@@ -7,16 +7,16 @@ import { tasksCollection } from "../db";
 import { withObservables } from "@nozbe/watermelondb/react";
 import TaskSegment from "../components/TaskSegment";
 
-function TaskList({ todo }) {
-  useEffect(() => {
-    (async () => {
-      let taskFromdb = await tasksCollection.query().fetch();
-      console.log("gerriss", taskFromdb.length);
-    })();
-  }, []);
+function TaskList({ tasks }) {
+  // useEffect(() => {
+  //   (async () => {
+  //     let taskFromdb = await tasksCollection.query().fetch();
+  //     console.log("gerriss", taskFromdb.length);
+  //   })();
+  // }, []);
   return (
     <View>
-      {todo.length>0 ? todo.map((to) => {
+      {tasks.length>0 ? tasks.map((to) => {
         return <TaskSegment to = {to} />;
       }):<View style={Styles.emptyScreen}>
         <Text style={Styles.emptyScreenText}>Go to Contacts details screen and add tasks to see tasks</Text>
@@ -26,8 +26,8 @@ function TaskList({ todo }) {
 }
 
 
-const enhance = withObservables([], () => ({
-  todo: tasksCollection.query().observe(),
+const enhance = withObservables(['tasks'], ({tasks}) => ({
+  tasks: tasksCollection.query(),
 }));
 
 const Styles = StyleSheet.create({

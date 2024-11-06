@@ -4,12 +4,13 @@ import { Q } from "@nozbe/watermelondb";
 import { useDispatch } from "react-redux";
 import { setSelectedContact } from "../store/contactSlice";
 import { useRouter } from "expo-router";
+import { withObservables } from "@nozbe/watermelondb/react";
 
-export default function TaskSegment(props) {
+function TaskSegment({to}) {
     const dispatch = useDispatch()
     const router = useRouter()
     const setContactDetail = async() =>{
-        const contact = await contactsCollection.query(Q.where('number', props.to.number)).fetch()
+        const contact = await contactsCollection.query(Q.where('number', to.number)).fetch()
         dispatch(setSelectedContact(contact[0]))
         router.push('/ContactDetail');
 
@@ -18,13 +19,19 @@ export default function TaskSegment(props) {
    return (
     <TouchableOpacity onPress={setContactDetail} style={Styles.cardContainer}>
       <View style={Styles.TextContainer}>
-        <Text style={Styles.primaryText}>TASK: {props.to.todo}</Text>
-        <Text style={Styles.secondaryText}>NAME: {props.to.name}</Text>
-        {/* <Text>{props.index}</Text> */}
+        <Text style={Styles.primaryText}>TASK: {to.todo}</Text>
+        <Text style={Styles.secondaryText}>NAME: {to.name}</Text>
+        {/* <Text>{to.created_at}aa{to.updated_at}</Text> */}
       </View>
     </TouchableOpacity>
   );
 }
+
+const enhance = withObservables([], ({to}:any) => ({
+    to: to.observe()
+}))
+
+export default enhance(TaskSegment)
 
 const Styles = StyleSheet.create({
   cardContainer: {
