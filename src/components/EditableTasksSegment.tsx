@@ -8,17 +8,19 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Feather from "@expo/vector-icons/Feather"; //<Feather name="edit-3" size={24} color="black" /> //edit
-import MaterialIcons from "@expo/vector-icons/MaterialIcons"; // <MaterialIcons name="delete-outline" size={24} color="black" /> //delete
+import Feather from "@expo/vector-icons/Feather";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
-import database, { tasksCollection } from "../db";
 import { withObservables } from "@nozbe/watermelondb/react";
+
 function EditableTasksSegment({ todos, updateTodoToDb, deleteFromDb }) {
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [todoText, SetTodoText] = useState<string>(todos.todo);
+
   const todoTextChange = (value: string) => {
     SetTodoText(value);
   };
+  
   return (
     <View>
       <View style={styles.taskContainer}>
@@ -27,15 +29,15 @@ function EditableTasksSegment({ todos, updateTodoToDb, deleteFromDb }) {
           <TouchableOpacity onPress={() => setModalVisible(true)}>
             <Feather name="edit-3" size={24} color="black" />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => {
-                deleteFromDb(todos.id);
-              }}>
+          <TouchableOpacity
+            onPress={() => {
+              deleteFromDb(todos.id);
+            }}
+          >
             <MaterialIcons name="delete-outline" size={24} color="black" />
           </TouchableOpacity>
-          <View style={styles.button}>
-          </View>
-          <View style={styles.button}>
-          </View>
+          <View style={styles.button}></View>
+          <View style={styles.button}></View>
         </View>
       </View>
       <Modal

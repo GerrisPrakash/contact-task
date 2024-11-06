@@ -6,17 +6,17 @@ import { setSelectedContact } from "../store/contactSlice";
 import { useRouter } from "expo-router";
 import { withObservables } from "@nozbe/watermelondb/react";
 
-function TaskSegment({to}) {
-    const dispatch = useDispatch()
-    const router = useRouter()
-    const setContactDetail = async() =>{
-        const contact = await contactsCollection.query(Q.where('number', to.number)).fetch()
-        dispatch(setSelectedContact(contact[0]))
-        router.push('/ContactDetail');
-
-        // console.log("scr", contact.length)r
-    }
-   return (
+function TaskSegment({ to }) {
+  const dispatch = useDispatch();
+  const router = useRouter();
+  const setContactDetail = async () => {
+    const contact = await contactsCollection
+      .query(Q.where("number", to.number))
+      .fetch();
+    dispatch(setSelectedContact(contact[0]));
+    router.push("/ContactDetail");
+  };
+  return (
     <TouchableOpacity onPress={setContactDetail} style={Styles.cardContainer}>
       <View style={Styles.TextContainer}>
         <Text style={Styles.primaryText}>{to.todo}</Text>
@@ -27,11 +27,12 @@ function TaskSegment({to}) {
   );
 }
 
-const enhance = withObservables([], ({to}:any) => ({
-    to: to.observe()
-}))
+//this is required to observe todo update change 
+const enhance = withObservables([], ({ to }: any) => ({
+  to: to.observe(),
+}));
 
-export default enhance(TaskSegment)
+export default enhance(TaskSegment);
 
 const Styles = StyleSheet.create({
   cardContainer: {

@@ -9,10 +9,10 @@ export default function ContactDetail() {
   return (
     <Provider store={store}>
       <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: "black", 
-        tabBarInactiveTintColor: "gray", 
-      }}
+        screenOptions={{
+          tabBarActiveTintColor: "black",
+          tabBarInactiveTintColor: "gray",
+        }}
       >
         <Tabs.Screen
           name="index"
@@ -21,7 +21,6 @@ export default function ContactDetail() {
             tabBarIcon: ({ size, color }) => (
               <MaterialIcons name="contacts" size={size} color={color} />
             ),
-            
           }}
         />
         <Tabs.Screen

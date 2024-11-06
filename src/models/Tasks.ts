@@ -8,5 +8,5 @@ export default class Tasks extends Model {
   @text('name') name: string;
   @text('number') number: string;
   @text('todo') todo: string;
-  @text('status') status: string;
+  @text('status') status: string; //pending, completed, Archived
 }

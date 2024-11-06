@@ -1,5 +1,14 @@
-import { Text, View, StyleSheet, Button, Modal, TextInput } from "react-native";
-import { useState, useEffect } from "react";
+import {
+  Text,
+  View,
+  StyleSheet,
+  Button,
+  Modal,
+  TextInput,
+  FlatList,
+  ScrollView,
+} from "react-native";
+import { useState } from "react";
 import { connect } from "react-redux";
 import { RootState } from "../store/store";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
@@ -7,35 +16,28 @@ import { withObservables } from "@nozbe/watermelondb/react";
 import database, { tasksCollection } from "../db";
 import { Q } from "@nozbe/watermelondb";
 import EditableTasksSegment from "../components/EditableTasksSegment";
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';// Main component function
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 function ContactDetail({ contact, todo }) {
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [todoText, settodoText] = useState("");
 
-  // Fetch tasks and contact data
-  useEffect(() => {
-    // Log tasks for debugging
-    (async () => {
-      let taskFromdb = await tasksCollection.query().fetch();
-      console.log("gerriss", taskFromdb.length);
-    })();
-  }, []);
-
-  // Update the task with the new todoText
   const todoTextChange = (value: string) => {
     settodoText(value);
   };
 
+  // create new to task table
   const createTodoToDb = async () => {
     await database.write(async () => {
       await tasksCollection.create((task) => {
         task.name = contact.name; // Use contact name from Redux
         task.number = contact.number; // Use contact number from Redux
         task.todo = todoText;
-        task.status = "pending"; // Set task status as pending
+        task.status = "pending"; // Set task status as pending 
       });
     });
   };
+
+  //update data in task table
   const updateTodoToDb = async (id: any, value: any) => {
     await database.write(async () => {
       const todo = await tasksCollection.find(id);
@@ -44,6 +46,8 @@ function ContactDetail({ contact, todo }) {
       });
     });
   };
+
+  //delete task table data permanantly
   const deleteFromDb = async (id: any) => {
     await database.write(async () => {
       const todo = await tasksCollection.find(id);
@@ -52,7 +56,7 @@ function ContactDetail({ contact, todo }) {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <Text style={styles.heading}>Personal Information</Text>
       <View style={styles.personalDetail}>
         <FontAwesome
@@ -65,41 +69,11 @@ function ContactDetail({ contact, todo }) {
         <Text style={styles.content}>phone: {contact?.number}</Text>
       </View>
 
-      <Text style={styles.heading}>Tasks</Text>
-      <View style={styles.personalDetail}>
-        {todo.length === 0 ? (
-          <View>
-            <MaterialCommunityIcons style={styles.addTodo} name="flask-empty-remove-outline" size={90} color="black" />
-            <Text style={styles.noTaskText}>No Tasks for {contact.name}</Text>
-          </View>
-        ) : (
-          todo.map((to: any) => {
-            return (
-              <EditableTasksSegment
-                todos={to}
-                updateTodoToDb={updateTodoToDb}
-                deleteFromDb={deleteFromDb}
-              />
-            );
-          })
-        )}
-        <View style={[styles.button, styles.addButton]}>
-          <Button
-            onPress={() => {
-              setModalVisible(true);
-              settodoText("");
-            }}
-            title="+ Add Task"
-            color="black"
-          />
-        </View>
-      </View>
-
       <Modal
         animationType="slide"
         transparent={true}
         visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)} // Close on Android back button press
+        onRequestClose={() => setModalVisible(false)} 
       >
         <View style={styles.centeredView}>
           <View style={styles.backdrop} />
@@ -111,7 +85,6 @@ function ContactDetail({ contact, todo }) {
               onChangeText={todoTextChange}
               value={todoText}
             />
-            {/* Close button */}
             <View style={styles.buttonContainer}>
               <View style={styles.button}>
                 <Button
@@ -135,7 +108,42 @@ function ContactDetail({ contact, todo }) {
           </View>
         </View>
       </Modal>
-    </View>
+      <Text style={styles.heading}>Tasks</Text>
+      <View style={styles.personalDetail}>
+        {todo.length === 0 ? (
+          <View>
+            <MaterialCommunityIcons
+              style={styles.addTodo}
+              name="flask-empty-remove-outline"
+              size={90}
+              color="black"
+            />
+            <Text style={styles.noTaskText}>No Tasks for {contact.name}</Text>
+          </View>
+        ) : (
+          <FlatList
+            data={todo}
+            renderItem={({ item }) => (
+              <EditableTasksSegment
+                todos={item}
+                updateTodoToDb={updateTodoToDb}
+                deleteFromDb={deleteFromDb}
+              />
+            )}
+          />
+        )}
+        <View style={[styles.button, styles.addButton]}>
+          <Button
+            onPress={() => {
+              setModalVisible(true);
+              settodoText("");
+            }}
+            title="+ Add Task"
+            color="black"
+          />
+        </View>
+      </View>
+    </ScrollView>
   );
 }
 
@@ -154,6 +162,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 40,
     paddingHorizontal: 8,
+    paddingBottom:100,
   },
   personalDetail: {
     backgroundColor: "white",
@@ -229,13 +238,14 @@ const styles = StyleSheet.create({
     backgroundColor: "red",
     marginHorizontal: "auto",
     marginTop: 20,
+    marginBottom: 40
   },
   addTodo: {
     marginHorizontal: "auto",
     marginTop: 30,
   },
   noTaskText: {
-    textAlign: 'center',
-    marginVertical: 20
-  }
+    textAlign: "center",
+    marginVertical: 20,
+  },
 });

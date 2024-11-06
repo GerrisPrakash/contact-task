@@ -5,28 +5,31 @@ import { useDispatch } from "react-redux";
 import { setSelectedContact } from "../store/contactSlice";
 import { useRouter } from "expo-router";
 export default function ContactCards(props) {
+
   const dispatch = useDispatch()
+
   useEffect(()=>{
     if(props.index === 0){
       dispatch(setSelectedContact(props.contact))
     }
   },[])
+
+  //set selected cotact to redux
   const setContact = () =>{
     dispatch(setSelectedContact(props.contact))
     router.push('/ContactDetail');
   }
+
   const router = useRouter()
+
   return (
-    // <TouchableOpacity>
     <TouchableOpacity onPress={setContact} style={Styles.cardContainer}>
       <FontAwesome name="user-circle-o" size={55} color="black" />
       <View style={Styles.TextContainer}>
         <Text style={Styles.primaryText}>{props.contact.name}</Text>
         <Text style={Styles.secondaryText}>{props.contact.number}</Text>
-        {/* <Text>{props.index}</Text> */}
       </View>
     </TouchableOpacity>
-    // </TouchableOpacity>
   );
 }
 

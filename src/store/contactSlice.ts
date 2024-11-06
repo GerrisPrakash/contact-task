@@ -19,7 +19,6 @@ export const contactSlice = createSlice({
   },
 })
 
-// Action creators are generated for each case reducer function
 export const { setSelectedContact } = contactSlice.actions
 
 export default contactSlice.reducer

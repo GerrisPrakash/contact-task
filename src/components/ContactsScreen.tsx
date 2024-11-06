@@ -20,6 +20,8 @@ import { RootState } from "../store/store";
 export default function ContactsScreen() {
   const [contacts, setContacts] = useState([]);
   const [accessDenied, setAccessDenied] = useState<boolean>(false);
+
+  //fetch contacts from expo contacts and store in db , it will fetch from expo contacts only one time
   useEffect(() => {
     (async () => {
       const contactCollection = database.get("contacts");
@@ -60,6 +62,8 @@ export default function ContactsScreen() {
     })();
   }, []);
   const [searchQuery, setSearchQuery] = useState("");
+
+  //run search querry on every text change and update into state variable
   useEffect(() => {
     (async () => {
       const contactsFromDB = await contactsCollection.query().fetch();

@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet, TextInput } from "react-native";
+import { Text, View, StyleSheet, TextInput, FlatList } from "react-native";
 import { useEffect, useState } from "react";
 import { Link } from "expo-router";
 import { tasksCollection } from "../db";
@@ -9,13 +9,17 @@ import TaskSegment from "../components/TaskSegment";
 function TaskList({ tasks }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [stateTask, setStateTask] = useState(tasks);
+
   useEffect(() => {
     runSearchQuerry();
   }, [searchQuery]);
+
   useEffect(() => {
     setStateTask(tasks);
     runSearchQuerry();
   }, [tasks]);
+
+  //run search querry and update state variable for search filtering
   const runSearchQuerry = () => {
     if (searchQuery.length > 0) {
       const filteredTask = tasks.filter((tod) => {
@@ -36,9 +40,12 @@ function TaskList({ tasks }) {
         onChangeText={(text) => setSearchQuery(text)}
       />
       {tasks.length > 0 ? (
-        stateTask.map((to) => {
-          return <TaskSegment to={to} />;
-        })
+        <FlatList
+            data={stateTask}
+            renderItem={({ item }) => (
+              <TaskSegment to={item} />
+            )}
+          />
       ) : (
         <View style={Styles.emptyScreen}>
           <Text style={Styles.emptyScreenText}>
