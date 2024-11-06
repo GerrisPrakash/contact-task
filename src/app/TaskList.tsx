@@ -1,14 +1,13 @@
 import { Text, View, StyleSheet, TextInput, FlatList } from "react-native";
 import { useEffect, useState } from "react";
-import { Link } from "expo-router";
 import { tasksCollection } from "../db";
 
 import { withObservables } from "@nozbe/watermelondb/react";
 import TaskSegment from "../components/TaskSegment";
 
 function TaskList({ tasks }) {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [stateTask, setStateTask] = useState(tasks);
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [stateTask, setStateTask] = useState<any>(tasks);
 
   useEffect(() => {
     runSearchQuerry();

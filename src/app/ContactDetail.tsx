@@ -19,7 +19,7 @@ import EditableTasksSegment from "../components/EditableTasksSegment";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 function ContactDetail({ contact, todo }) {
   const [modalVisible, setModalVisible] = useState<boolean>(false);
-  const [todoText, settodoText] = useState("");
+  const [todoText, settodoText] = useState<string>("");
 
   const todoTextChange = (value: string) => {
     settodoText(value);

@@ -18,7 +18,7 @@ import { setSelectedContact } from "../store/contactSlice";
 import { RootState } from "../store/store";
 
 export default function ContactsScreen() {
-  const [contacts, setContacts] = useState([]);
+  const [contacts, setContacts] = useState<any>([]);
   const [accessDenied, setAccessDenied] = useState<boolean>(false);
 
   //fetch contacts from expo contacts and store in db , it will fetch from expo contacts only one time
