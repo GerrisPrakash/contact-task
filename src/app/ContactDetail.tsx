@@ -7,8 +7,7 @@ import { withObservables } from "@nozbe/watermelondb/react";
 import database, { tasksCollection } from "../db";
 import { Q } from "@nozbe/watermelondb";
 import EditableTasksSegment from "../components/EditableTasksSegment";
-
-// Main component function
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';// Main component function
 function ContactDetail({ contact, todo }) {
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [todoText, settodoText] = useState("");
@@ -37,19 +36,19 @@ function ContactDetail({ contact, todo }) {
       });
     });
   };
-  const updateTodoToDb = async (id:any, value:any) => {
+  const updateTodoToDb = async (id: any, value: any) => {
     await database.write(async () => {
-        const todo = await tasksCollection.find(id)
-        await todo.update(() => {
-            todo.todo = value
-        })
-      })
+      const todo = await tasksCollection.find(id);
+      await todo.update(() => {
+        todo.todo = value;
+      });
+    });
   };
-  const deleteFromDb = async (id:any) => {
+  const deleteFromDb = async (id: any) => {
     await database.write(async () => {
-        const todo = await tasksCollection.find(id)
-        await todo.destroyPermanently()
-      })
+      const todo = await tasksCollection.find(id);
+      await todo.destroyPermanently();
+    });
   };
 
   return (
@@ -68,10 +67,23 @@ function ContactDetail({ contact, todo }) {
 
       <Text style={styles.heading}>Tasks</Text>
       <View style={styles.personalDetail}>
-        {todo.map((to:any) => {
-          return <EditableTasksSegment todos={to} updateTodoToDb={updateTodoToDb} deleteFromDb={deleteFromDb} />;
-        })}
-        <View style={styles.button}>
+        {todo.length === 0 ? (
+          <View>
+            <MaterialCommunityIcons style={styles.addTodo} name="flask-empty-remove-outline" size={90} color="black" />
+            <Text style={styles.noTaskText}>No Tasks for {contact.name}</Text>
+          </View>
+        ) : (
+          todo.map((to: any) => {
+            return (
+              <EditableTasksSegment
+                todos={to}
+                updateTodoToDb={updateTodoToDb}
+                deleteFromDb={deleteFromDb}
+              />
+            );
+          })
+        )}
+        <View style={[styles.button, styles.addButton]}>
           <Button
             onPress={() => {
               setModalVisible(true);
@@ -83,7 +95,6 @@ function ContactDetail({ contact, todo }) {
         </View>
       </View>
 
-      {/* Modal for adding new task */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -214,4 +225,17 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 20,
   },
+  addButton: {
+    backgroundColor: "red",
+    marginHorizontal: "auto",
+    marginTop: 20,
+  },
+  addTodo: {
+    marginHorizontal: "auto",
+    marginTop: 30,
+  },
+  noTaskText: {
+    textAlign: 'center',
+    marginVertical: 20
+  }
 });

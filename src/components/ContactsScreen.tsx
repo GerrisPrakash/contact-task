@@ -1,4 +1,12 @@
-import { Button, FlatList, Modal, StyleSheet, Text, View } from "react-native";
+import {
+  Button,
+  FlatList,
+  Modal,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import * as Contacts from "expo-contacts";
 import { useEffect, useState } from "react";
 import { Link } from "expo-router";
@@ -50,24 +58,51 @@ export default function ContactsScreen() {
       contactsFromDB = await contactCollection.query().fetch();
       setContacts(contactsFromDB);
     })();
-  }, [contacts]);
+  }, []);
+  const [searchQuery, setSearchQuery] = useState("");
+  useEffect(() => {
+    (async () => {
+      const contactsFromDB = await contactsCollection.query().fetch();
+      if (searchQuery.length > 0) {
+        const filteredContacts = contactsFromDB.filter((tod) => {
+          return (
+            tod.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            tod.number.toLowerCase().includes(searchQuery.toLowerCase())
+          );
+        });
+        setContacts(filteredContacts);
+      } else {
+        setContacts(contactsFromDB);
+      }
+    })();
+  }, [searchQuery]);
+
   return (
     <>
       {accessDenied ? (
         <Modal visible={accessDenied}>
-          <View  style={styles.accessDenied}>
+          <View style={styles.accessDenied}>
             <Text style={styles.text}>
-            Go to Settings {">"} contact-task {">"} Contacts and toggle to allow access.
+              Go to Settings {">"} contact-task {">"} Contacts and toggle to
+              allow access.
             </Text>
           </View>
         </Modal>
       ) : (
-        <FlatList
-          data={contacts}
-          renderItem={({ item, index }) => (
-            <ContactCards contact={item} index={index} />
-          )}
-        />
+        <View>
+          <TextInput
+            style={styles.search}
+            placeholder="Search Contact"
+            value={searchQuery}
+            onChangeText={(text) => setSearchQuery(text)}
+          />
+          <FlatList
+            data={contacts}
+            renderItem={({ item, index }) => (
+              <ContactCards contact={item} index={index} />
+            )}
+          />
+        </View>
       )}
     </>
   );
@@ -79,10 +114,19 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     // backgroundColor: "red", // Optional background color
-    margin: 20
+    margin: 20,
   },
-  text:{
+  text: {
     marginVertical: 20,
-    fontSize:18
-  }
+    fontSize: 18,
+  },
+  search: {
+    backgroundColor: "white",
+    borderColor: "#d3d3d3",
+    borderWidth: 1,
+    borderRadius: 200,
+    margin: 15,
+    height: 50,
+    paddingHorizontal: 30,
+  },
 });

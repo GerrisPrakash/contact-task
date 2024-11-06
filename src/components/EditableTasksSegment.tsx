@@ -1,9 +1,19 @@
 import { useState } from "react";
-import { Button, Modal, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  Button,
+  Modal,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import Feather from "@expo/vector-icons/Feather"; //<Feather name="edit-3" size={24} color="black" /> //edit
+import MaterialIcons from "@expo/vector-icons/MaterialIcons"; // <MaterialIcons name="delete-outline" size={24} color="black" /> //delete
 
 import database, { tasksCollection } from "../db";
 import { withObservables } from "@nozbe/watermelondb/react";
-function EditableTasksSegment({todos, updateTodoToDb, deleteFromDb}) {
+function EditableTasksSegment({ todos, updateTodoToDb, deleteFromDb }) {
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [todoText, SetTodoText] = useState<string>(todos.todo);
   const todoTextChange = (value: string) => {
@@ -11,30 +21,28 @@ function EditableTasksSegment({todos, updateTodoToDb, deleteFromDb}) {
   };
   return (
     <View>
-      <Text>{todos.todo}</Text>
-      <View style={styles.buttonContainer}>
-        <View style={styles.button}>
-          <Button
-            onPress={() => setModalVisible(true)}
-            title="edit"
-            color="gray"
-          />
-        </View>
-        <View style={styles.button}>
-          <Button
-            onPress={() => {
-              deleteFromDb(todos.id);
-            }}
-            title="delete"
-            color="black"
-          />
+      <View style={styles.taskContainer}>
+        <Text style={styles.todoText}>{todos.todo}</Text>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity onPress={() => setModalVisible(true)}>
+            <Feather name="edit-3" size={24} color="black" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => {
+                deleteFromDb(todos.id);
+              }}>
+            <MaterialIcons name="delete-outline" size={24} color="black" />
+          </TouchableOpacity>
+          <View style={styles.button}>
+          </View>
+          <View style={styles.button}>
+          </View>
         </View>
       </View>
       <Modal
         animationType="slide"
         transparent={true}
         visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)} 
+        onRequestClose={() => setModalVisible(false)}
       >
         <View style={styles.centeredView}>
           <View style={styles.backdrop} />
@@ -77,11 +85,11 @@ function EditableTasksSegment({todos, updateTodoToDb, deleteFromDb}) {
   );
 }
 
-const enhance = withObservables([], ({todos}:any) => ({
-    todos: todos.observe()
-}))
+const enhance = withObservables([], ({ todos }: any) => ({
+  todos: todos.observe(),
+}));
 
-export default enhance(EditableTasksSegment)
+export default enhance(EditableTasksSegment);
 
 const styles = StyleSheet.create({
   centeredView: {
@@ -132,5 +140,18 @@ const styles = StyleSheet.create({
   },
   button: {
     width: 100,
+  },
+  taskContainer: {
+    margin: 20,
+    display: "flex",
+    flexDirection: "row",
+    width: "100%",
+    alignItems: "center",
+  },
+  todoText: {
+    fontSize: 18,
+    marginBottom: 12,
+    width: "68%",
+    marginRight: 10,
   },
 });

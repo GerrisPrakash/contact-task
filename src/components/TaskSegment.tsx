@@ -19,9 +19,9 @@ function TaskSegment({to}) {
    return (
     <TouchableOpacity onPress={setContactDetail} style={Styles.cardContainer}>
       <View style={Styles.TextContainer}>
-        <Text style={Styles.primaryText}>TASK: {to.todo}</Text>
+        <Text style={Styles.primaryText}>{to.todo}</Text>
         <Text style={Styles.secondaryText}>NAME: {to.name}</Text>
-        {/* <Text>{to.created_at}aa{to.updated_at}</Text> */}
+        {/* <Text>{JSON.stringify(to.created_at)}aa{to.updated_at}</Text> */}
       </View>
     </TouchableOpacity>
   );
